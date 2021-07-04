@@ -11,7 +11,7 @@ final class Connection implements ConnectionInterface
 {
 	/** @var array */
 	protected $options = [
-		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+		PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT,
 		PDO::ATTR_EMULATE_PREPARES => false,
 		PDO::ATTR_STRINGIFY_FETCHES => false
 	];
@@ -62,14 +62,22 @@ final class Connection implements ConnectionInterface
 	public function execute(string $sql, array $params = []): bool
 	{
 		$stm = $this->prepare($sql);
-		$result = $stm->execute($params);
 
-		$this->changes = $stm->rowCount();
+		if ($stm) {
 
-		return $result;
+			$result = $stm->execute($params);
+			$this->changes = $stm->rowCount();
+
+			return $result;
+		}
+
+		return false;
 	}
 
-	protected function prepare(string $sql): PDOStatement
+	/**
+	 * @return false|PDOStatement
+	 */
+	protected function prepare(string $sql)
 	{
 		$database = $this->getDatabase();
 		$stm = $database->prepare($sql);
@@ -81,15 +89,21 @@ final class Connection implements ConnectionInterface
 	{
 		$results = $this->fetchAll($sql, $params);
 
-		return $results->first();
+		return $results ? $results->first() : null;
 	}
 
-	public function fetchAll(string $sql, array $params = []): ResultSetInterface
+	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface
 	{
 		$stm = $this->prepare($sql);
-		$stm->execute($params);
 
-		return new ResultSet($stm);
+		if ($stm) {
+
+			$stm->execute($params);
+
+			return new ResultSet($stm);
+		}
+
+		return null;
 	}
 
 	/**
@@ -98,12 +112,18 @@ final class Connection implements ConnectionInterface
 	public function fetchValue(string $sql, array $params = [])
 	{
 		$stm = $this->prepare($sql);
-		$stm->execute($params);
 
-		/** @var false|\ArrayAccess */
-		$result = $stm->fetch(PDO::FETCH_LAZY);
+		if ($stm) {
 
-		return $result === false ? null : $result[0];
+			$stm->execute($params);
+
+			/** @var false|\ArrayAccess */
+			$result = $stm->fetch(PDO::FETCH_LAZY);
+
+			return $result ? $result[0] : false;
+		}
+
+		return false;
 	}
 
 	public function lastInsertId(): int

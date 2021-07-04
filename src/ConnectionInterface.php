@@ -11,7 +11,7 @@ interface ConnectionInterface
 	 * @return null|array<string, mixed>
 	 */
 	public function fetchRow(string $sql, array $params = []): ?array;
-	public function fetchAll(string $sql, array $params = []): ResultSetInterface;
+	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface;
 	/**
 	 * @return mixed
 	 */
