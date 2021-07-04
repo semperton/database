@@ -1,0 +1,14 @@
+{
+    "name": "semperton/database",
+    "description": "A compact PDO wrapper library.",
+    "type": "library",
+    "license": "MIT",
+    "require-dev": {
+        "vimeo/psalm": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Semperton\\Database\\": "src/"
+        }
+    }
+}
