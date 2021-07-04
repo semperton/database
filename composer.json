@@ -3,12 +3,20 @@
     "description": "A compact PDO wrapper library.",
     "type": "library",
     "license": "MIT",
+    "require": {
+        "php": ">=7.2.0",
+        "ext-pdo": "*"
+    },
     "require-dev": {
-        "vimeo/psalm": "^4.8"
+        "vimeo/psalm": "^4.8",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
             "Semperton\\Database\\": "src/"
         }
+    },
+    "scripts": {
+        "test": "phpunit tests"
     }
 }
