@@ -7,6 +7,8 @@ namespace Semperton\Database;
 use PDO;
 use PDOStatement;
 
+use function iterator_to_array;
+
 final class ResultSet implements ResultSetInterface
 {
 	/** @var PDOStatement */
