@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Semperton\Database;
 
+use ArrayAccess;
 use PDO;
 use PDOStatement;
 
@@ -59,19 +60,24 @@ final class Connection implements ConnectionInterface
 		return $this->instance;
 	}
 
+	public function setDatabase(PDO $database): self
+	{
+		$this->instance = $database;
+		return $this;
+	}
+
 	public function execute(string $sql, array $params = []): bool
 	{
 		$stm = $this->prepare($sql);
 
-		if ($stm) {
-
-			$result = $stm->execute($params);
-			$this->changes = $stm->rowCount();
-
-			return $result;
+		if (!$stm) {
+			return false;
 		}
 
-		return false;
+		$result = $stm->execute($params);
+		$this->changes = $stm->rowCount();
+
+		return $result;
 	}
 
 	/**
@@ -96,14 +102,13 @@ final class Connection implements ConnectionInterface
 	{
 		$stm = $this->prepare($sql);
 
-		if ($stm) {
-
-			$stm->execute($params);
-
-			return new ResultSet($stm);
+		if (!$stm) {
+			return null;
 		}
 
-		return null;
+		$stm->execute($params);
+
+		return new ResultSet($stm);
 	}
 
 	/**
@@ -113,17 +118,16 @@ final class Connection implements ConnectionInterface
 	{
 		$stm = $this->prepare($sql);
 
-		if ($stm) {
-
-			$stm->execute($params);
-
-			/** @var false|\ArrayAccess */
-			$result = $stm->fetch(PDO::FETCH_LAZY);
-
-			return $result ? $result[0] : false;
+		if (!$stm) {
+			return false;
 		}
 
-		return false;
+		$stm->execute($params);
+
+		/** @var false|ArrayAccess */
+		$result = $stm->fetch(PDO::FETCH_LAZY);
+
+		return $result ? $result[0] : false;
 	}
 
 	public function lastInsertId(): int
