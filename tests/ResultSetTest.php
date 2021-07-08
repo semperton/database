@@ -33,7 +33,22 @@ final class ResultSetTest extends TestCase
 		$result = $conn->fetchAll('values (42), (2), (1), (3)');
 		$count = $result->count();
 
+		// end of iterator
+		$this->assertNull($result->current());
 		$this->assertSame(4, $count);
+
+		$result = $conn->fetchAll('values (42), (2)');
+		$this->assertEquals(2, count($result));
+
+		$this->assertNull($result->current());
+	}
+
+	public function testToArray(): void
+	{
+		$conn = new Connection('sqlite::memory:');
+		$result = $conn->fetchAll('values (42), (2), (1)');
+		$arr = $result->toArray();
+		$this->assertIsArray($arr);
 	}
 
 	public function testIterator(): void
@@ -63,5 +78,25 @@ final class ResultSetTest extends TestCase
 		$result->rewind();
 
 		$this->assertEquals(0, $result->key());
+	}
+
+	public function testResultMutation(): void
+	{
+		$conn = new Connection('sqlite::memory:');
+		$conn->execute('create table test (id integer not null primary key, number integer not null, text varchar not null)');
+
+		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
+		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
+		$result = $conn->fetchAll('select * from test');
+
+		$this->assertEquals(2, count($result));
+
+		$conn->execute('insert into test (number, text) values (?, ?)', [77, 'between']);
+
+		$this->assertEquals(3, count($result));
+
+		$conn->execute('delete from test where number < ?', [77]);
+
+		$this->assertEquals(1, count($result));
 	}
 }
