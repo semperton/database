@@ -7,6 +7,7 @@ namespace Semperton\Database;
 use PDO;
 use PDOStatement;
 
+use function iterator_count;
 use function iterator_to_array;
 
 final class ResultSet implements ResultSetInterface
@@ -16,9 +17,6 @@ final class ResultSet implements ResultSetInterface
 
 	/** @var null|false|array<string, mixed> */
 	protected $current;
-
-	/** @var null|int */
-	protected $count;
 
 	/** @var null|int */
 	protected $position;
@@ -40,27 +38,13 @@ final class ResultSet implements ResultSetInterface
 		return $this->current();
 	}
 
-	/** @psalm-suppress UnusedForeachValue */
 	public function count(): int
 	{
-		if ($this->count === null) {
-
-			$this->count = 0;
-
-			foreach ($this as $row) {
-				$this->count++;
-			}
-		}
-
-		return $this->count;
+		return iterator_count($this);
 	}
 
-	/**
-	 * @return array<string, mixed>
-	 */
 	public function toArray(): array
 	{
-		/** @var array<string, mixed> */
 		return iterator_to_array($this);
 	}
 
@@ -76,8 +60,8 @@ final class ResultSet implements ResultSetInterface
 		if ($this->position === null) {
 			$this->rewind();
 		}
-		/** @var int */
-		return $this->position;
+
+		return (int)$this->position;
 	}
 
 	/**
