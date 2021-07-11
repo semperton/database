@@ -70,14 +70,17 @@ final class Connection implements ConnectionInterface
 	{
 		$stm = $this->prepare($sql);
 
-		if (!$stm) {
-			return false;
+		if ($stm) {
+
+			$result = $stm->execute($params);
+			$this->changes = $stm->rowCount();
+
+			$stm->closeCursor();
+
+			return $result;
 		}
 
-		$result = $stm->execute($params);
-		$this->changes = $stm->rowCount();
-
-		return $result;
+		return false;
 	}
 
 	/**
@@ -102,32 +105,38 @@ final class Connection implements ConnectionInterface
 	{
 		$stm = $this->prepare($sql);
 
-		if (!$stm) {
-			return null;
+		if ($stm) {
+
+			$stm->execute($params);
+
+			return new ResultSet($stm);
 		}
 
-		$stm->execute($params);
-
-		return new ResultSet($stm);
+		return null;
 	}
 
 	/**
-	 * @return mixed
+	 * @return false|scalar
 	 */
 	public function fetchValue(string $sql, array $params = [])
 	{
 		$stm = $this->prepare($sql);
 
-		if (!$stm) {
-			return false;
+		if ($stm) {
+
+			$stm->execute($params);
+
+			/** @var false|ArrayAccess */
+			$result = $stm->fetch(PDO::FETCH_LAZY);
+			/** @var scalar */
+			$value = $result ? $result[0] : false;
+
+			$stm->closeCursor();
+
+			return $value;
 		}
 
-		$stm->execute($params);
-
-		/** @var false|ArrayAccess */
-		$result = $stm->fetch(PDO::FETCH_LAZY);
-
-		return $result ? $result[0] : false;
+		return false;
 	}
 
 	public function lastInsertId(): int
