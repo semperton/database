@@ -7,7 +7,6 @@ namespace Semperton\Database;
 use PDO;
 use PDOStatement;
 
-use function iterator_count;
 use function iterator_to_array;
 
 final class ResultSet implements ResultSetInterface
@@ -15,15 +14,22 @@ final class ResultSet implements ResultSetInterface
 	/** @var PDOStatement */
 	protected $statement;
 
-	/** @var null|false|array<string, mixed> */
+	/** @var null|array<string, mixed> */
 	protected $current;
 
-	/** @var null|int */
-	protected $position;
+	/** @var int */
+	protected $position = -1;
 
 	public function __construct(PDOStatement $statement)
 	{
 		$this->statement = $statement;
+
+		/** @psalm-suppress TypeDoesNotContainNull */
+		if ($statement->errorCode() === null) {
+			$statement->execute();
+		}
+
+		$this->next();
 	}
 
 	/**
@@ -31,37 +37,46 @@ final class ResultSet implements ResultSetInterface
 	 */
 	public function first(): ?array
 	{
-		if ($this->position !== 0) {
-			$this->rewind();
-		}
-
+		$this->rewind();
 		return $this->current();
 	}
 
 	public function count(): int
 	{
-		return iterator_count($this);
+		$this->statement->closeCursor();
+		$this->statement->execute();
+
+		$count = 0;
+		while (false !== $this->statement->fetch(PDO::FETCH_LAZY)) {
+			$count++;
+		}
+
+		$this->position = -1;
+		$this->current = null;
+
+		return $count;
 	}
 
 	public function toArray(): array
 	{
+		/** @var array */
 		return iterator_to_array($this);
 	}
 
 	public function rewind(): void
 	{
-		$this->statement->execute();
-		$this->current = $this->statement->fetch(PDO::FETCH_ASSOC);
-		$this->position = 0;
+		if ($this->position !== 0) {
+
+			$this->position = -1;
+			$this->statement->closeCursor();
+			$this->statement->execute();
+			$this->next();
+		}
 	}
 
-	public function key(): int
+	public function key(): ?int
 	{
-		if ($this->position === null) {
-			$this->rewind();
-		}
-
-		return (int)$this->position;
+		return $this->position >= 0 ? $this->position : null;
 	}
 
 	/**
@@ -69,22 +84,24 @@ final class ResultSet implements ResultSetInterface
 	 */
 	public function current(): ?array
 	{
-		if ($this->current === null) {
-			$this->rewind();
-		}
-		return $this->current !== false ? $this->current : null;
+		return $this->current;
 	}
 
 	public function next(): void
 	{
-		$this->current();
-		$this->current = $this->statement->fetch(PDO::FETCH_ASSOC);
-		$this->position = (int)$this->position + 1;
+		$record = $this->statement->fetch(PDO::FETCH_ASSOC);
+
+		if ($record !== false) {
+			$this->current = $record;
+			$this->position++;
+		} else {
+			$this->current = null;
+			$this->position = -1;
+		}
 	}
 
 	public function valid(): bool
 	{
-		$this->current();
-		return $this->current !== false;
+		return $this->current !== null;
 	}
 }

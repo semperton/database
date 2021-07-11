@@ -89,6 +89,8 @@ final class ResultSetTest extends TestCase
 		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
 		$result = $conn->fetchAll('select * from test');
 
+		$this->assertTrue($result->valid());
+
 		$this->assertEquals(2, count($result));
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [77, 'between']);
