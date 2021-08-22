@@ -19,8 +19,8 @@ Database requires PHP 7.2+
 
 ## Connection
 
-The ```Connection``` class is a PDO wrapper.
-The constructor accepts the same parameters as the PDO constructor.
+The ```Connection``` class is a ```PDO``` wrapper.
+Its constructor accepts the same parameters as the ```PDO``` constructor.
 
 ```PHP
 use Semperton\Database\Connection;
@@ -32,19 +32,21 @@ $connection = new Connection('dsn', null, null, [
 $database = $connection->getDatabase(); // PDO object
 $connection->setDatabase($database);
 
-// ConnectionInterface
-execute(string $sql, array $params = []): bool // execute a sql statement
-fetchRow(string $sql, array $params = []): ?array // fetch a single row (assoc)
-fetchAll(string $sql, array $params = []): ?ResultSetInterface // fetch all rows as a result set
-fetchValue(string $sql, array $params = []) // fetch a single value
-lastInsertId(): int // get the last insert id
-affectedRows(): int // get affected rows
+interface ConnectionInterface
+{
+	public function execute(string $sql, array $params = []): bool;
+	public function fetchRow(string $sql, array $params = []): ?array;
+	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface;
+	public function fetchValue(string $sql, array $params = []);
+	public function lastInsertId(): int;
+	public function affectedRows(): int;
+}
 ```
 
 ## ResultSet
 
 The ```ResultSet``` class is a wrapper around ```PDOStatement::fetch``` calls.
-It's an ```Iterator``` with additional ```first()```, ```count()```, and ```toArray()``` methods.
+It's an ```Iterator``` with additional ```first()```, ```count()``` and ```toArray()``` methods.
 
 ```PHP
 $users = $connection->fetchAll('select * from user limit :limit', ['limit' => 5]);
