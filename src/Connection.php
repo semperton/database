@@ -60,12 +60,6 @@ final class Connection implements ConnectionInterface
 		return $this->instance;
 	}
 
-	public function setDatabase(PDO $database): self
-	{
-		$this->instance = $database;
-		return $this;
-	}
-
 	public function execute(string $sql, array $params = []): bool
 	{
 		$stm = $this->prepare($sql);
