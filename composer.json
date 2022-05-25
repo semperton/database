@@ -18,6 +18,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit tests"
+        "test": "phpunit tests",
+        "check": "psalm --no-cache"
     }
 }
