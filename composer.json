@@ -8,6 +8,7 @@
         "ext-pdo": "*"
     },
     "require-dev": {
+        "ext-pdo_sqlite": "*",
         "vimeo/psalm": "^4.8",
         "phpunit/phpunit": "^9.5"
     },
