@@ -47,9 +47,6 @@ final class ResultSet implements ResultSetInterface
 
 	public function count(): int
 	{
-		$this->position = -1;
-		$this->current = null;
-
 		$this->execute();
 
 		$count = 0;
@@ -57,12 +54,15 @@ final class ResultSet implements ResultSetInterface
 			$count++;
 		}
 
+		$this->position = -1;
+		$this->current = null;
+
 		return $count;
 	}
 
 	public function toArray(): array
 	{
-		/** @var array */
+		/** @var array<int, array<string, mixed>> */
 		return iterator_to_array($this, false);
 	}
 

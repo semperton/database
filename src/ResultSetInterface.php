@@ -14,5 +14,8 @@ interface ResultSetInterface extends Iterator, Countable
 	 */
 	public function first(): ?array;
 
+	/**
+	 * @return array<int, array<string, mixed>>
+	 */
 	public function toArray(): array;
 }
