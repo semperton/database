@@ -14,22 +14,25 @@ final class ResultSet implements ResultSetInterface
 	/** @var PDOStatement */
 	protected $statement;
 
+	/** @var array */
+	protected $params;
+
+	/** @var bool */
+	protected $executed;
+
 	/** @var null|array<string, mixed> */
 	protected $current;
 
 	/** @var int */
 	protected $position = -1;
 
-	public function __construct(PDOStatement $statement)
+	public function __construct(PDOStatement $statement, array $params)
 	{
 		$this->statement = $statement;
+		$this->params = $params;
 
-		/** @psalm-suppress TypeDoesNotContainNull */
-		if ($statement->errorCode() === null) {
-			$statement->execute();
-		}
-
-		$this->next();
+		/** @psalm-suppress RedundantCondition */
+		$this->executed = $this->statement->errorCode() !== null;
 	}
 
 	/**
@@ -38,21 +41,21 @@ final class ResultSet implements ResultSetInterface
 	public function first(): ?array
 	{
 		$this->rewind();
+
 		return $this->current();
 	}
 
 	public function count(): int
 	{
-		$this->statement->closeCursor();
-		$this->statement->execute();
+		$this->position = -1;
+		$this->current = null;
+
+		$this->execute();
 
 		$count = 0;
 		while (false !== $this->statement->fetch(PDO::FETCH_LAZY)) {
 			$count++;
 		}
-
-		$this->position = -1;
-		$this->current = null;
 
 		return $count;
 	}
@@ -60,22 +63,22 @@ final class ResultSet implements ResultSetInterface
 	public function toArray(): array
 	{
 		/** @var array */
-		return iterator_to_array($this);
+		return iterator_to_array($this, false);
 	}
 
 	public function rewind(): void
 	{
-		if ($this->position !== 0) {
-
-			$this->position = -1;
-			$this->statement->closeCursor();
-			$this->statement->execute();
-			$this->next();
-		}
+		$this->position = -1;
+		$this->execute();
+		$this->next();
 	}
 
 	public function key(): ?int
 	{
+		if (!$this->executed) {
+			$this->rewind();
+		}
+
 		return $this->position >= 0 ? $this->position : null;
 	}
 
@@ -84,11 +87,19 @@ final class ResultSet implements ResultSetInterface
 	 */
 	public function current(): ?array
 	{
+		if (!$this->executed) {
+			$this->rewind();
+		}
+
 		return $this->current;
 	}
 
 	public function next(): void
 	{
+		if (!$this->executed) {
+			$this->rewind();
+		}
+
 		$record = $this->statement->fetch(PDO::FETCH_ASSOC);
 
 		if ($record !== false) {
@@ -102,6 +113,17 @@ final class ResultSet implements ResultSetInterface
 
 	public function valid(): bool
 	{
+		if (!$this->executed) {
+			$this->rewind();
+		}
+
 		return $this->current !== null;
+	}
+
+	protected function execute(): void
+	{
+		$this->statement->closeCursor();
+		$this->statement->execute($this->params);
+		$this->executed = true;
 	}
 }
