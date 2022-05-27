@@ -1,12 +1,12 @@
 <div align="center">
 <a href="https://github.com/semperton">
-<img src="https://avatars0.githubusercontent.com/u/76976189?s=140" alt="Semperton">
+<img width="140" src="https://raw.githubusercontent.com/semperton/misc/main/readme-logo.svg" alt="Semperton">
 </a>
 <h1>Semperton Database</h1>
 <p>A compact PDO wrapper library.</p>
-//
 </div>
-<hr>
+
+---
 
 ## Installation
 
@@ -29,23 +29,25 @@ $connection = new Connection('dsn', null, null, [
 	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 ]);
 
-$database = $connection->getDatabase(); // PDO object
-$connection->setDatabase($database);
-
 interface ConnectionInterface
 {
 	public function execute(string $sql, array $params = []): bool;
 	public function fetchRow(string $sql, array $params = []): ?array;
-	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface;
+	public function fetchAll(string $sql, array $params = []): iterable;
+	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface;
 	public function fetchValue(string $sql, array $params = []);
-	public function lastInsertId(): int;
+	public function inTransaction(): bool;
+	public function beginTransaction(): bool;
+	public function commit(): bool;
+	public function rollBack(): bool;
+	public function lastInsertId(?string $name = null): int;
 	public function affectedRows(): int;
 }
 ```
 
 ## ResultSet
 
-The ```ResultSet``` class is a wrapper around ```PDOStatement::fetch``` calls.
+The ```ResultSet``` class is a wrapper around ```PDOStatement::execute``` and ```PDOStatement::fetch``` calls.
 It's an ```Iterator``` with additional ```first()```, ```count()``` and ```toArray()``` methods.
 
 ```PHP
