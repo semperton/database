@@ -6,7 +6,6 @@ namespace Semperton\Database;
 
 use ArrayAccess;
 use PDO;
-use PDOStatement;
 
 final class Connection implements ConnectionInterface
 {
@@ -18,16 +17,16 @@ final class Connection implements ConnectionInterface
 	];
 
 	/** @var string */
-	protected $dsn;
+	private $dsn;
 
 	/** @var null|string */
-	protected $username;
+	private $username;
 
 	/** @var null|string */
-	protected $password;
+	private $password;
 
 	/** @var null|PDO */
-	protected $instance;
+	protected $pdo = null;
 
 	/** @var int */
 	protected $changes = 0;
@@ -36,20 +35,18 @@ final class Connection implements ConnectionInterface
 		string $dsn,
 		?string $username = null,
 		?string $password = null,
-		?array $options = null
+		array $options = []
 	) {
 		$this->dsn = $dsn;
 		$this->username = $username;
 		$this->password = $password;
-		if ($options) {
-			$this->options = $options + $this->options;
-		}
+		$this->options = $options + $this->options;
 	}
 
-	public function getDatabase(): PDO
+	protected function getPDO(): PDO
 	{
-		if ($this->instance === null) {
-			$this->instance = new PDO(
+		if ($this->pdo === null) {
+			$this->pdo = new PDO(
 				$this->dsn,
 				$this->username,
 				$this->password,
@@ -57,12 +54,12 @@ final class Connection implements ConnectionInterface
 			);
 		}
 
-		return $this->instance;
+		return $this->pdo;
 	}
 
 	public function execute(string $sql, array $params = []): bool
 	{
-		$stm = $this->prepare($sql);
+		$stm = $this->getPDO()->prepare($sql);
 
 		if ($stm) {
 
@@ -77,17 +74,6 @@ final class Connection implements ConnectionInterface
 		return false;
 	}
 
-	/**
-	 * @return false|PDOStatement
-	 */
-	protected function prepare(string $sql)
-	{
-		$database = $this->getDatabase();
-		$stm = $database->prepare($sql);
-
-		return $stm;
-	}
-
 	public function fetchRow(string $sql, array $params = []): ?array
 	{
 		$results = $this->fetchAll($sql, $params);
@@ -97,13 +83,11 @@ final class Connection implements ConnectionInterface
 
 	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface
 	{
-		$stm = $this->prepare($sql);
+		$stm = $this->getPDO()->prepare($sql);
 
 		if ($stm) {
 
-			$stm->execute($params);
-
-			return new ResultSet($stm);
+			return new ResultSet($stm, $params);
 		}
 
 		return null;
@@ -114,7 +98,7 @@ final class Connection implements ConnectionInterface
 	 */
 	public function fetchValue(string $sql, array $params = [])
 	{
-		$stm = $this->prepare($sql);
+		$stm = $this->getPDO()->prepare($sql);
 
 		if ($stm) {
 
@@ -133,11 +117,29 @@ final class Connection implements ConnectionInterface
 		return false;
 	}
 
-	public function lastInsertId(): int
+	public function inTransaction(): bool
 	{
-		$database = $this->getDatabase();
+		return $this->getPDO()->inTransaction();
+	}
 
-		return (int)$database->lastInsertId();
+	public function beginTransaction(): bool
+	{
+		return $this->getPDO()->beginTransaction();
+	}
+
+	public function commit(): bool
+	{
+		return $this->getPDO()->commit();
+	}
+
+	public function rollBack(): bool
+	{
+		return $this->getPDO()->rollBack();
+	}
+
+	public function lastInsertId(?string $name = null): int
+	{
+		return (int)$this->getPDO()->lastInsertId($name);
 	}
 
 	public function affectedRows(): int
