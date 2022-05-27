@@ -49,6 +49,8 @@ final class ResultSetTest extends TestCase
 		$result = $conn->fetchAll('values (42), (2), (1)');
 		$arr = $result->toArray();
 		$this->assertIsArray($arr);
+
+		$this->assertSame([0, 1, 2], array_keys($arr));
 	}
 
 	public function testIterator(): void
