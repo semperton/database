@@ -10,7 +10,9 @@ final class ResultSetTest extends TestCase
 {
 	public function testInstance(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new Connection('sqlite::memory:', null, null, [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
+		]);
 		$result = $conn->fetchResult('select');
 		$this->assertNull($result);
 

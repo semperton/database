@@ -11,15 +11,15 @@ final class ConnectionTest extends TestCase
 	public function testException(): void
 	{
 		$this->expectException(PDOException::class);
-		$conn = new Connection('sqlite::memory:', null, null, [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		]);
+		$conn = new Connection('sqlite::memory:');
 		$conn->execute('select');
 	}
 
 	public function testExecute(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new Connection('sqlite::memory:', null, null, [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
+		]);
 		$result = $conn->execute('create table test (id integer not null primary key)');
 		$this->assertTrue($result);
 
