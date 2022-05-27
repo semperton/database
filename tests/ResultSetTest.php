@@ -11,17 +11,17 @@ final class ResultSetTest extends TestCase
 	public function testInstance(): void
 	{
 		$conn = new Connection('sqlite::memory:');
-		$result = $conn->fetchAll('select');
+		$result = $conn->fetchResult('select');
 		$this->assertNull($result);
 
-		$result = $conn->fetchAll('select 1');
+		$result = $conn->fetchResult('select 1');
 		$this->assertInstanceOf(ResultSetInterface::class, $result);
 	}
 
 	public function testFirst(): void
 	{
 		$conn = new Connection('sqlite::memory:');
-		$result = $conn->fetchAll('values (42), (2), (1)');
+		$result = $conn->fetchResult('values (42), (2), (1)');
 		$first = $result->first();
 
 		$this->assertSame('42', reset($first));
@@ -30,14 +30,14 @@ final class ResultSetTest extends TestCase
 	public function testCount(): void
 	{
 		$conn = new Connection('sqlite::memory:');
-		$result = $conn->fetchAll('values (42), (2), (1), (3)');
+		$result = $conn->fetchResult('values (42), (2), (1), (3)');
 		$count = $result->count();
 
 		// end of iterator
 		$this->assertNull($result->current());
 		$this->assertSame(4, $count);
 
-		$result = $conn->fetchAll('values (42), (2)');
+		$result = $conn->fetchResult('values (42), (2)');
 		$this->assertEquals(2, count($result));
 
 		$this->assertNull($result->current());
@@ -46,7 +46,7 @@ final class ResultSetTest extends TestCase
 	public function testToArray(): void
 	{
 		$conn = new Connection('sqlite::memory:');
-		$result = $conn->fetchAll('values (42), (2), (1)');
+		$result = $conn->fetchResult('values (42), (2), (1)');
 		$arr = $result->toArray();
 		$this->assertIsArray($arr);
 
@@ -56,7 +56,7 @@ final class ResultSetTest extends TestCase
 	public function testIterator(): void
 	{
 		$conn = new Connection('sqlite::memory:');
-		$result = $conn->fetchAll('values (1), (2), (3), (4), (5)');
+		$result = $conn->fetchResult('values (1), (2), (3), (4), (5)');
 
 		$this->assertEquals(0, $result->key());
 
@@ -89,7 +89,7 @@ final class ResultSetTest extends TestCase
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
 		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
-		$result = $conn->fetchAll('select * from test');
+		$result = $conn->fetchResult('select * from test');
 
 		$this->assertTrue($result->valid());
 

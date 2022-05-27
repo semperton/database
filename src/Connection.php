@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Semperton\Database;
 
 use ArrayAccess;
+use Generator;
 use PDO;
 
 final class Connection implements ConnectionInterface
@@ -78,10 +79,33 @@ final class Connection implements ConnectionInterface
 	{
 		$results = $this->fetchAll($sql, $params);
 
-		return $results ? $results->first() : null;
+		$first = $results->current();
+
+		/** @var null|array<string, mixed> $first */
+		return $first;
 	}
 
-	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface
+	/**
+	 * @psalm-suppress MethodSignatureMismatch
+	 * @return Generator<int, array<string, mixed>>
+	 */
+	public function fetchAll(string $sql, array $params = []): Generator
+	{
+		$stm = $this->getPDO()->prepare($sql);
+
+		if ($stm) {
+
+			$stm->execute($params);
+
+			while (false !== $record = $stm->fetch(PDO::FETCH_ASSOC)) {
+				yield $record;
+			}
+
+			$stm->closeCursor();
+		}
+	}
+
+	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface
 	{
 		$stm = $this->getPDO()->prepare($sql);
 

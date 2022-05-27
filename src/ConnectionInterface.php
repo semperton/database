@@ -13,7 +13,12 @@ interface ConnectionInterface
 	 */
 	public function fetchRow(string $sql, array $params = []): ?array;
 
-	public function fetchAll(string $sql, array $params = []): ?ResultSetInterface;
+	/**
+	 * @return iterable<int, array<string, mixed>>
+	 */
+	public function fetchAll(string $sql, array $params = []): iterable;
+
+	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface;
 
 	/**
 	 * @return mixed
@@ -28,7 +33,7 @@ interface ConnectionInterface
 
 	public function rollBack(): bool;
 
-	public function lastInsertId(?string $name): int;
+	public function lastInsertId(?string $name = null): int;
 
 	public function affectedRows(): int;
 }

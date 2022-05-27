@@ -59,7 +59,27 @@ final class ConnectionTest extends TestCase
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
 		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
 
-		$rows = $conn->fetchAll('select number, text from test');
+		$rows = $conn->fetchAll('select number from test where id');
+
+		$number = 42;
+		foreach ($rows as $row) {
+			$this->assertNotEmpty($row['number']);
+			$this->assertEquals($number, $row['number']);
+			$number = 55;
+		}
+
+		$this->assertEquals(55, $number);
+	}
+
+	public function testFetchResult(): void
+	{
+		$conn = new Connection('sqlite::memory:');
+		$conn->execute('create table test (id integer not null primary key, number integer not null, text varchar not null)');
+
+		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
+		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
+
+		$rows = $conn->fetchResult('select number, text from test');
 
 		$this->assertInstanceOf(ResultSetInterface::class, $rows);
 
