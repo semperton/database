@@ -8,21 +8,6 @@ use Semperton\Database\ResultSetInterface;
 
 final class ConnectionTest extends TestCase
 {
-	public function testOptions(): void
-	{
-		$conn = new Connection('sqlite::memory:');
-		$pdo = $conn->getDatabase();
-
-		$this->assertEquals($pdo->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_SILENT);
-
-		$conn2 = new Connection('sqlite::memory:', null, null, [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		]);
-		$pdo2 = $conn2->getDatabase();
-
-		$this->assertEquals($pdo2->getAttribute(PDO::ATTR_ERRMODE), PDO::ERRMODE_EXCEPTION);
-	}
-
 	public function testException(): void
 	{
 		$this->expectException(PDOException::class);
@@ -61,7 +46,8 @@ final class ConnectionTest extends TestCase
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
 		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
-		$row = $conn->fetchRow('select number, text from test where id = ?', [2]);
+
+		$row = $conn->fetchRow('select number, text from test where id = :id', [':id' => 2]);
 		$this->assertSame(['number' => '55', 'text' => 'world'], $row);
 	}
 
