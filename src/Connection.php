@@ -44,7 +44,7 @@ final class Connection implements ConnectionInterface
 		$this->options = $options + $this->options;
 	}
 
-	protected function getPDO(): PDO
+	public function getPdo(): PDO
 	{
 		if ($this->pdo === null) {
 			$this->pdo = new PDO(
@@ -60,7 +60,7 @@ final class Connection implements ConnectionInterface
 
 	public function execute(string $sql, array $params = []): bool
 	{
-		$stm = $this->getPDO()->prepare($sql);
+		$stm = $this->getPdo()->prepare($sql);
 
 		if ($stm) {
 
@@ -91,7 +91,7 @@ final class Connection implements ConnectionInterface
 	 */
 	public function fetchAll(string $sql, array $params = []): Generator
 	{
-		$stm = $this->getPDO()->prepare($sql);
+		$stm = $this->getPdo()->prepare($sql);
 
 		if ($stm) {
 
@@ -107,7 +107,7 @@ final class Connection implements ConnectionInterface
 
 	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface
 	{
-		$stm = $this->getPDO()->prepare($sql);
+		$stm = $this->getPdo()->prepare($sql);
 
 		if ($stm) {
 
@@ -122,7 +122,7 @@ final class Connection implements ConnectionInterface
 	 */
 	public function fetchValue(string $sql, array $params = [])
 	{
-		$stm = $this->getPDO()->prepare($sql);
+		$stm = $this->getPdo()->prepare($sql);
 
 		if ($stm) {
 
@@ -143,27 +143,27 @@ final class Connection implements ConnectionInterface
 
 	public function inTransaction(): bool
 	{
-		return $this->getPDO()->inTransaction();
+		return $this->getPdo()->inTransaction();
 	}
 
 	public function beginTransaction(): bool
 	{
-		return $this->getPDO()->beginTransaction();
+		return $this->getPdo()->beginTransaction();
 	}
 
 	public function commit(): bool
 	{
-		return $this->getPDO()->commit();
+		return $this->getPdo()->commit();
 	}
 
 	public function rollBack(): bool
 	{
-		return $this->getPDO()->rollBack();
+		return $this->getPdo()->rollBack();
 	}
 
 	public function lastInsertId(?string $name = null): int
 	{
-		return (int)$this->getPDO()->lastInsertId($name);
+		return (int)$this->getPdo()->lastInsertId($name);
 	}
 
 	public function affectedRows(): int
