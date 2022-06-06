@@ -117,9 +117,6 @@ final class Connection implements ConnectionInterface
 		return null;
 	}
 
-	/**
-	 * @return false|scalar
-	 */
 	public function fetchValue(string $sql, array $params = [])
 	{
 		$stm = $this->getPdo()->prepare($sql);

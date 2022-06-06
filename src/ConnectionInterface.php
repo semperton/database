@@ -21,7 +21,7 @@ interface ConnectionInterface
 	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface;
 
 	/**
-	 * @return mixed
+	 * @return false|scalar
 	 */
 	public function fetchValue(string $sql, array $params = []);
 
