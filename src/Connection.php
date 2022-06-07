@@ -105,7 +105,7 @@ final class Connection implements ConnectionInterface
 		}
 	}
 
-	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface
+	public function fetchResult(string $sql, array $params = []): ResultSetInterface
 	{
 		$stm = $this->getPdo()->prepare($sql);
 
@@ -114,7 +114,7 @@ final class Connection implements ConnectionInterface
 			return new ResultSet($stm, $params);
 		}
 
-		return null;
+		return new EmptyResultSet();
 	}
 
 	public function fetchValue(string $sql, array $params = [])

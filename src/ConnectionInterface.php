@@ -18,7 +18,7 @@ interface ConnectionInterface
 	 */
 	public function fetchAll(string $sql, array $params = []): iterable;
 
-	public function fetchResult(string $sql, array $params = []): ?ResultSetInterface;
+	public function fetchResult(string $sql, array $params = []): ResultSetInterface;
 
 	/**
 	 * @return false|scalar

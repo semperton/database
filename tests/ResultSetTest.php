@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use Semperton\Database\Connection;
-use Semperton\Database\ResultSetInterface;
+use Semperton\Database\EmptyResultSet;
+use Semperton\Database\ResultSet;
 
 final class ResultSetTest extends TestCase
 {
@@ -14,10 +15,10 @@ final class ResultSetTest extends TestCase
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
 		]);
 		$result = $conn->fetchResult('select');
-		$this->assertNull($result);
+		$this->assertInstanceOf(EmptyResultSet::class, $result);
 
 		$result = $conn->fetchResult('select 1');
-		$this->assertInstanceOf(ResultSetInterface::class, $result);
+		$this->assertInstanceOf(ResultSet::class, $result);
 	}
 
 	public function testFirst(): void
