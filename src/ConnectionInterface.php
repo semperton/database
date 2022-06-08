@@ -6,24 +6,24 @@ namespace Semperton\Database;
 
 interface ConnectionInterface
 {
-	public function execute(string $sql, array $params = []): bool;
+	public function execute(string $sql, ?array $params = null): bool;
 
 	/**
 	 * @return null|array<string, mixed>
 	 */
-	public function fetchRow(string $sql, array $params = []): ?array;
+	public function fetchRow(string $sql, ?array $params = null): ?array;
 
 	/**
 	 * @return iterable<int, array<string, mixed>>
 	 */
-	public function fetchAll(string $sql, array $params = []): iterable;
+	public function fetchAll(string $sql, ?array $params = null): iterable;
 
-	public function fetchResult(string $sql, array $params = []): ResultSetInterface;
+	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface;
 
 	/**
 	 * @return false|scalar
 	 */
-	public function fetchValue(string $sql, array $params = []);
+	public function fetchValue(string $sql, ?array $params = null);
 
 	public function inTransaction(): bool;
 
@@ -33,7 +33,7 @@ interface ConnectionInterface
 
 	public function rollBack(): bool;
 
-	public function lastInsertId(?string $name = null): int;
+	public function lastInsertId(): int;
 
 	public function affectedRows(): int;
 }

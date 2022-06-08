@@ -7,6 +7,7 @@ namespace Semperton\Database;
 use ArrayAccess;
 use Generator;
 use PDO;
+use PDOStatement;
 
 final class Connection implements ConnectionInterface
 {
@@ -58,7 +59,7 @@ final class Connection implements ConnectionInterface
 		return $this->pdo;
 	}
 
-	public function execute(string $sql, array $params = []): bool
+	public function execute(string $sql, ?array $params = null): bool
 	{
 		$stm = $this->getPdo()->prepare($sql);
 
@@ -75,7 +76,7 @@ final class Connection implements ConnectionInterface
 		return false;
 	}
 
-	public function fetchRow(string $sql, array $params = []): ?array
+	public function fetchRow(string $sql, ?array $params = null): ?array
 	{
 		$results = $this->fetchAll($sql, $params);
 
@@ -89,7 +90,7 @@ final class Connection implements ConnectionInterface
 	 * @psalm-suppress MethodSignatureMismatch
 	 * @return Generator<int, array<string, mixed>>
 	 */
-	public function fetchAll(string $sql, array $params = []): Generator
+	public function fetchAll(string $sql, ?array $params = null): Generator
 	{
 		$stm = $this->getPdo()->prepare($sql);
 
@@ -105,7 +106,7 @@ final class Connection implements ConnectionInterface
 		}
 	}
 
-	public function fetchResult(string $sql, array $params = []): ResultSetInterface
+	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface
 	{
 		$stm = $this->getPdo()->prepare($sql);
 
@@ -117,7 +118,7 @@ final class Connection implements ConnectionInterface
 		return new EmptyResultSet();
 	}
 
-	public function fetchValue(string $sql, array $params = [])
+	public function fetchValue(string $sql, ?array $params = null)
 	{
 		$stm = $this->getPdo()->prepare($sql);
 
@@ -158,9 +159,9 @@ final class Connection implements ConnectionInterface
 		return $this->getPdo()->rollBack();
 	}
 
-	public function lastInsertId(?string $name = null): int
+	public function lastInsertId(): int
 	{
-		return (int)$this->getPdo()->lastInsertId($name);
+		return (int)$this->getPdo()->lastInsertId();
 	}
 
 	public function affectedRows(): int

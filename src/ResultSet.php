@@ -14,7 +14,7 @@ final class ResultSet implements ResultSetInterface
 	/** @var PDOStatement */
 	protected $statement;
 
-	/** @var array */
+	/** @var null|array */
 	protected $params;
 
 	/** @var bool */
@@ -26,7 +26,7 @@ final class ResultSet implements ResultSetInterface
 	/** @var int */
 	protected $position = -1;
 
-	public function __construct(PDOStatement $statement, array $params)
+	public function __construct(PDOStatement $statement, ?array $params)
 	{
 		$this->statement = $statement;
 		$this->params = $params;
