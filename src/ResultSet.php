@@ -14,9 +14,6 @@ final class ResultSet implements ResultSetInterface
 	/** @var PDOStatement */
 	protected $statement;
 
-	/** @var null|array */
-	protected $params;
-
 	/** @var bool */
 	protected $executed;
 
@@ -26,10 +23,9 @@ final class ResultSet implements ResultSetInterface
 	/** @var int */
 	protected $position = -1;
 
-	public function __construct(PDOStatement $statement, ?array $params)
+	public function __construct(PDOStatement $statement)
 	{
 		$this->statement = $statement;
-		$this->params = $params;
 
 		/** @psalm-suppress RedundantCondition */
 		$this->executed = $this->statement->errorCode() !== null;
@@ -123,7 +119,7 @@ final class ResultSet implements ResultSetInterface
 	protected function execute(): void
 	{
 		$this->statement->closeCursor();
-		$this->statement->execute($this->params);
+		$this->statement->execute();
 		$this->executed = true;
 	}
 }

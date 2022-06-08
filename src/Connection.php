@@ -59,13 +59,48 @@ final class Connection implements ConnectionInterface
 		return $this->pdo;
 	}
 
+	protected function prepare(string $sql, ?array $params): ?PDOStatement
+	{
+		if ($stm = $this->getPdo()->prepare($sql)) {
+
+			if ($params) {
+
+				/** @var mixed $value */
+				foreach ($params as $param => $value) {
+
+					$type = PDO::PARAM_STR;
+
+					switch (gettype($value)) {
+						case 'integer':
+							$type = PDO::PARAM_INT;
+							break;
+						case 'boolean':
+							$type = PDO::PARAM_BOOL;
+							break;
+						case 'NULL':
+							$type = PDO::PARAM_NULL;
+							break;
+					}
+
+					if (is_int($param)) {
+						++$param;
+					}
+
+					$stm->bindValue($param, $value, $type);
+				}
+			}
+
+			return $stm;
+		}
+
+		return null;
+	}
+
 	public function execute(string $sql, ?array $params = null): bool
 	{
-		$stm = $this->getPdo()->prepare($sql);
+		if ($stm = $this->prepare($sql, $params)) {
 
-		if ($stm) {
-
-			$result = $stm->execute($params);
+			$result = $stm->execute();
 			$this->changes = $stm->rowCount();
 
 			$stm->closeCursor();
@@ -92,11 +127,9 @@ final class Connection implements ConnectionInterface
 	 */
 	public function fetchAll(string $sql, ?array $params = null): Generator
 	{
-		$stm = $this->getPdo()->prepare($sql);
+		if ($stm = $this->prepare($sql, $params)) {
 
-		if ($stm) {
-
-			$stm->execute($params);
+			$stm->execute();
 
 			while (false !== $record = $stm->fetch(PDO::FETCH_ASSOC)) {
 				yield $record;
@@ -108,11 +141,9 @@ final class Connection implements ConnectionInterface
 
 	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface
 	{
-		$stm = $this->getPdo()->prepare($sql);
+		if ($stm = $this->prepare($sql, $params)) {
 
-		if ($stm) {
-
-			return new ResultSet($stm, $params);
+			return new ResultSet($stm);
 		}
 
 		return new EmptyResultSet();
@@ -120,11 +151,9 @@ final class Connection implements ConnectionInterface
 
 	public function fetchValue(string $sql, ?array $params = null)
 	{
-		$stm = $this->getPdo()->prepare($sql);
+		if ($stm = $this->prepare($sql, $params)) {
 
-		if ($stm) {
-
-			$stm->execute($params);
+			$stm->execute();
 
 			/** @var false|ArrayAccess */
 			$result = $stm->fetch(PDO::FETCH_LAZY);
