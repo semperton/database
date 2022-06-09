@@ -1,6 +1,6 @@
 {
     "name": "semperton/database",
-    "description": "A compact PDO wrapper library.",
+    "description": "A compact PDO / SQLite wrapper library.",
     "type": "library",
     "license": "MIT",
     "require": {
