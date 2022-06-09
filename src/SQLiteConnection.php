@@ -125,13 +125,8 @@ final class SQLiteConnection implements ConnectionInterface
 	{
 		if ($result = $this->exec($sql, $params)) {
 
-			$value = null;
-
-			if ($result->numColumns() > 0) {
-
-				/** @var false|scalar */
-				$value = $result->fetchArray(SQLITE3_NUM)[0];
-			}
+			/** @var null|scalar */
+			$value = ($row = $result->fetchArray(SQLITE3_NUM)) ? $row[0] : null;
 
 			$result->finalize();
 
