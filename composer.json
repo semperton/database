@@ -4,10 +4,11 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": ">=7.2.0",
-        "ext-pdo": "*"
+        "php": ">=7.2.0"
     },
     "require-dev": {
+        "ext-pdo": "*",
+        "ext-sqlite3": "*",
         "ext-pdo_sqlite": "*",
         "vimeo/psalm": "^4.8",
         "phpunit/phpunit": "^9.5"
