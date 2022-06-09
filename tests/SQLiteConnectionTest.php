@@ -3,23 +3,23 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use Semperton\Database\Connection;
-use Semperton\Database\ResultSetInterface;
+use Semperton\Database\SQLiteConnection;
+use Semperton\Database\SQLiteResultSet;
 
-final class ConnectionTest extends TestCase
+final class SQLiteConnectionTest extends TestCase
 {
 	public function testException(): void
 	{
-		$this->expectException(PDOException::class);
-		$conn = new Connection('sqlite::memory:');
+		$this->expectException(Exception::class);
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('select');
 	}
 
 	public function testExecute(): void
 	{
-		$conn = new Connection('sqlite::memory:', null, null, [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
-		]);
+		$this->expectException(Exception::class);
+
+		$conn = new SQLiteConnection(':memory:');
 		$result = $conn->execute('create table test (id integer primary key)');
 		$this->assertTrue($result);
 
@@ -29,7 +29,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchValue(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -41,19 +41,19 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchRow(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
 		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
 
 		$row = $conn->fetchRow('select number, text from test where id = :id', [':id' => 2]);
-		$this->assertSame(['number' => '55', 'text' => 'world'], $row);
+		$this->assertSame(['number' => 55, 'text' => 'world'], $row);
 	}
 
 	public function testFetchAll(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -73,7 +73,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchResult(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -81,11 +81,11 @@ final class ConnectionTest extends TestCase
 
 		$rows = $conn->fetchResult('select number, text from test');
 
-		$this->assertInstanceOf(ResultSetInterface::class, $rows);
+		$this->assertInstanceOf(SQLiteResultSet::class, $rows);
 
 		$expected = [
-			['number' => '42', 'text' => 'hello'],
-			['number' => '55', 'text' => 'world']
+			['number' => 42, 'text' => 'hello'],
+			['number' => 55, 'text' => 'world']
 		];
 
 		$this->assertSame($expected, $rows->toArray());
@@ -93,7 +93,7 @@ final class ConnectionTest extends TestCase
 
 	public function testLastInsertId(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -104,7 +104,7 @@ final class ConnectionTest extends TestCase
 
 	public function testAffectedRows(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new SQLiteConnection(':memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);

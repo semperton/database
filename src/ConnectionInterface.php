@@ -4,24 +4,35 @@ declare(strict_types=1);
 
 namespace Semperton\Database;
 
+use Generator;
+
 interface ConnectionInterface
 {
+	/**
+	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 */
 	public function execute(string $sql, ?array $params = null): bool;
 
 	/**
+	 * @param null|array<int, mixed>|array<string, mixed> $params
 	 * @return null|array<string, mixed>
 	 */
 	public function fetchRow(string $sql, ?array $params = null): ?array;
 
 	/**
-	 * @return iterable<int, array<string, mixed>>
+	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 * @return Generator<int, array<string, mixed>>
 	 */
-	public function fetchAll(string $sql, ?array $params = null): iterable;
+	public function fetchAll(string $sql, ?array $params = null): Generator;
 
+	/**
+	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 */
 	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface;
 
 	/**
-	 * @return false|scalar
+	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 * @return false|null|scalar
 	 */
 	public function fetchValue(string $sql, ?array $params = null);
 

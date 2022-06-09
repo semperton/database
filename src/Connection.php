@@ -45,7 +45,7 @@ final class Connection implements ConnectionInterface
 		$this->options = $options + $this->options;
 	}
 
-	public function getPdo(): PDO
+	public function getPDO(): PDO
 	{
 		if ($this->pdo === null) {
 			$this->pdo = new PDO(
@@ -61,7 +61,7 @@ final class Connection implements ConnectionInterface
 
 	protected function prepare(string $sql, ?array $params): ?PDOStatement
 	{
-		if ($stm = $this->getPdo()->prepare($sql)) {
+		if ($stm = $this->getPDO()->prepare($sql)) {
 
 			if ($params) {
 
@@ -83,7 +83,7 @@ final class Connection implements ConnectionInterface
 					}
 
 					if (is_int($param)) {
-						++$param;
+						$param++;
 					}
 
 					$stm->bindValue($param, $value, $type);
@@ -121,10 +121,6 @@ final class Connection implements ConnectionInterface
 		return $first;
 	}
 
-	/**
-	 * @psalm-suppress MethodSignatureMismatch
-	 * @return Generator<int, array<string, mixed>>
-	 */
 	public function fetchAll(string $sql, ?array $params = null): Generator
 	{
 		if ($stm = $this->prepare($sql, $params)) {
@@ -157,7 +153,7 @@ final class Connection implements ConnectionInterface
 
 			/** @var false|ArrayAccess */
 			$result = $stm->fetch(PDO::FETCH_LAZY);
-			/** @var scalar */
+			/** @var false|null|scalar */
 			$value = $result ? $result[0] : false;
 
 			$stm->closeCursor();
@@ -170,27 +166,27 @@ final class Connection implements ConnectionInterface
 
 	public function inTransaction(): bool
 	{
-		return $this->getPdo()->inTransaction();
+		return $this->getPDO()->inTransaction();
 	}
 
 	public function beginTransaction(): bool
 	{
-		return $this->getPdo()->beginTransaction();
+		return $this->getPDO()->beginTransaction();
 	}
 
 	public function commit(): bool
 	{
-		return $this->getPdo()->commit();
+		return $this->getPDO()->commit();
 	}
 
 	public function rollBack(): bool
 	{
-		return $this->getPdo()->rollBack();
+		return $this->getPDO()->rollBack();
 	}
 
 	public function lastInsertId(): int
 	{
-		return (int)$this->getPdo()->lastInsertId();
+		return (int)$this->getPDO()->lastInsertId();
 	}
 
 	public function affectedRows(): int
