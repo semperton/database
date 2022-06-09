@@ -9,6 +9,9 @@ use Generator;
 use PDO;
 use PDOStatement;
 
+use function gettype;
+use function is_int;
+
 final class Connection implements ConnectionInterface
 {
 	/** @var array */
