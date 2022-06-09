@@ -50,8 +50,8 @@ final class ResultSet implements ResultSetInterface
 			$count++;
 		}
 
-		$this->position = -1;
 		$this->current = null;
+		$this->position = -1;
 
 		return $count;
 	}
@@ -96,6 +96,7 @@ final class ResultSet implements ResultSetInterface
 			$this->rewind();
 		}
 
+		/** @var false|array<string, mixed> */
 		$record = $this->statement->fetch(PDO::FETCH_ASSOC);
 
 		if ($record !== false) {
