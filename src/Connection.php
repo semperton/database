@@ -73,16 +73,12 @@ final class Connection implements ConnectionInterface
 
 					$type = PDO::PARAM_STR;
 
-					switch (gettype($value)) {
-						case 'integer':
-							$type = PDO::PARAM_INT;
-							break;
-						case 'boolean':
-							$type = PDO::PARAM_BOOL;
-							break;
-						case 'NULL':
-							$type = PDO::PARAM_NULL;
-							break;
+					if (is_int($value)) {
+						$type = PDO::PARAM_INT;
+					} else if (is_bool($value)) {
+						$type = PDO::PARAM_BOOL;
+					} else if (is_null($value)) {
+						$type = PDO::PARAM_NULL;
 					}
 
 					if (is_int($param)) {
