@@ -68,6 +68,11 @@ final class Connection implements ConnectionInterface
 
 			if ($params) {
 
+				if (key($params) === 0) {
+					array_unshift($params, null);
+					unset($params[0]);
+				}
+
 				/** @var mixed $value */
 				foreach ($params as $param => $value) {
 
@@ -79,10 +84,6 @@ final class Connection implements ConnectionInterface
 						$type = PDO::PARAM_BOOL;
 					} else if (is_null($value)) {
 						$type = PDO::PARAM_NULL;
-					}
-
-					if (is_int($param)) {
-						$param++;
 					}
 
 					$stm->bindValue($param, $value, $type);

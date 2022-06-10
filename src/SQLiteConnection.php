@@ -47,12 +47,13 @@ final class SQLiteConnection implements ConnectionInterface
 
 			if ($params) {
 
+				if (key($params) === 0) {
+					array_unshift($params, null);
+					unset($params[0]);
+				}
+
 				/** @var mixed $value */
 				foreach ($params as $param => $value) {
-
-					if (is_int($param)) {
-						$param++;
-					}
 
 					// in SQLite the type gets automatically
 					// detected from the type of the value
