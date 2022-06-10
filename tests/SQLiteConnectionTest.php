@@ -115,4 +115,32 @@ final class SQLiteConnectionTest extends TestCase
 		$affected = $conn->affectedRows();
 		$this->assertEquals(2, $affected);
 	}
+
+	public function testInTransaction(): void
+	{
+		$conn = new SQLiteConnection(':memory:');
+
+		$conn->getSQLite()->enableExceptions(true);
+
+		$this->assertFalse($conn->inTransaction());
+
+		$conn->beginTransaction();
+
+		$this->assertTrue($conn->inTransaction());
+
+		$conn->commit();
+
+		$this->assertFalse($conn->inTransaction());
+
+		// without exceptions
+		$conn->getSQLite()->enableExceptions(false);
+
+		$conn->beginTransaction();
+
+		$this->assertTrue($conn->inTransaction());
+
+		$conn->commit();
+
+		$this->assertFalse($conn->inTransaction());
+	}
 }

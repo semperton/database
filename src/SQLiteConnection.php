@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Semperton\Database;
 
+use Exception;
 use Generator;
 use SQLite3;
 use SQLite3Result;
@@ -140,8 +141,27 @@ final class SQLiteConnection implements ConnectionInterface
 
 	public function inTransaction(): bool
 	{
-		// TODO: how to check this
-		return false;
+		$sqlite = $this->getSQLite();
+
+		try {
+
+			if ($sqlite->exec('begin')) {
+
+				$sqlite->exec('commit');
+				return false;
+			}
+
+			return true;
+		} catch (Exception $exception) {
+
+			$message = $sqlite->lastErrorMsg();
+
+			if ($message === 'cannot start a transaction within a transaction') {
+				return true;
+			}
+
+			throw $exception;
+		}
 	}
 
 	public function beginTransaction(): bool
