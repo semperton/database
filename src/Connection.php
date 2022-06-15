@@ -9,8 +9,11 @@ use Generator;
 use PDO;
 use PDOStatement;
 
-use function gettype;
+use function key;
+use function array_unshift;
 use function is_int;
+use function is_bool;
+use function is_null;
 
 final class Connection implements ConnectionInterface
 {

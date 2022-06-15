@@ -10,7 +10,8 @@ use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;
 
-use function is_int;
+use function key;
+use function array_unshift;
 
 use const SQLITE3_ASSOC;
 
