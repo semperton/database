@@ -15,9 +15,21 @@ interface ConnectionInterface
 
 	/**
 	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 * @return false|null|scalar
+	 */
+	public function fetchValue(string $sql, ?array $params = null);
+
+	/**
+	 * @param null|array<int, mixed>|array<string, mixed> $params
 	 * @return null|array<string, mixed>
 	 */
 	public function fetchRow(string $sql, ?array $params = null): ?array;
+
+	/**
+	 * @param null|array<int, mixed>|array<string, mixed> $params
+	 * @return Generator<int, mixed>
+	 */
+	public function fetchColumn(string $sql, ?array $params = null, int $column = 0): Generator;
 
 	/**
 	 * @param null|array<int, mixed>|array<string, mixed> $params
@@ -29,12 +41,6 @@ interface ConnectionInterface
 	 * @param null|array<int, mixed>|array<string, mixed> $params
 	 */
 	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface;
-
-	/**
-	 * @param null|array<int, mixed>|array<string, mixed> $params
-	 * @return false|null|scalar
-	 */
-	public function fetchValue(string $sql, ?array $params = null);
 
 	public function inTransaction(): bool;
 

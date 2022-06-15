@@ -101,6 +101,18 @@ final class SQLiteConnection implements ConnectionInterface
 		return $first;
 	}
 
+	public function fetchColumn(string $sql, ?array $params = null, int $column = 0): Generator
+	{
+		if ($result = $this->exec($sql, $params)) {
+
+			while (false !== $value = $result->fetchArray(SQLITE3_NUM)) {
+				yield $value[$column] ?? null;
+			}
+
+			$result->finalize();
+		}
+	}
+
 	/**
 	 * @psalm-suppress MixedReturnTypeCoercion
 	 */

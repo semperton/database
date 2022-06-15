@@ -124,6 +124,21 @@ final class Connection implements ConnectionInterface
 		return $first;
 	}
 
+	public function fetchColumn(string $sql, ?array $params = null, int $column = 0): Generator
+	{
+		if ($stm = $this->prepare($sql, $params)) {
+
+			$stm->execute();
+
+			/** @psalm-suppress InvalidArrayAccess */
+			while (false !== $record = $stm->fetch(PDO::FETCH_LAZY)) {
+				yield $record[$column];
+			}
+
+			$stm->closeCursor();
+		}
+	}
+
 	public function fetchAll(string $sql, ?array $params = null): Generator
 	{
 		if ($stm = $this->prepare($sql, $params)) {

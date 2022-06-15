@@ -143,4 +143,19 @@ final class SQLiteConnectionTest extends TestCase
 
 		$this->assertFalse($conn->inTransaction());
 	}
+
+	public function testFetchColumn(): void
+	{
+		$conn = new SQLiteConnection(':memory:');
+		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
+
+		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
+		$conn->execute('insert into test (number, text) values (?, ?)', [55, 'world']);
+
+		$rows = $conn->fetchColumn('select number, text from test');
+		$this->assertSame([42, 55], iterator_to_array($rows));
+
+		$rows = $conn->fetchColumn('select number, text from test', null, 1);
+		$this->assertSame(['hello', 'world'], iterator_to_array($rows));
+	}
 }
