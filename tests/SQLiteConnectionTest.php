@@ -158,4 +158,19 @@ final class SQLiteConnectionTest extends TestCase
 		$rows = $conn->fetchColumn('select number, text from test', null, 1);
 		$this->assertSame(['hello', 'world'], iterator_to_array($rows));
 	}
+
+	public function testInitCallback(): void
+	{
+		$count = 0;
+		$conn = new SQLiteConnection(':memory:', true, function (SQLite3 $sqlite) use (&$count) {
+			$this->assertInstanceOf(SQLite3::class, $sqlite);
+			$count++;
+		});
+
+		$conn->getSQLite();
+		$conn->getSQLite();
+		$conn->getSQLite();
+
+		$this->assertEquals(1, $count);
+	}
 }

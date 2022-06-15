@@ -34,32 +34,42 @@ final class Connection implements ConnectionInterface
 	private $password;
 
 	/** @var null|PDO */
-	protected $pdo = null;
+	protected $pdo;
 
 	/** @var int */
 	protected $changes = 0;
+
+	/** @var null|callable */
+	protected $initCallback;
 
 	public function __construct(
 		string $dsn,
 		?string $username = null,
 		?string $password = null,
-		array $options = []
+		array $options = [],
+		?callable $initCallback = null
 	) {
 		$this->dsn = $dsn;
 		$this->username = $username;
 		$this->password = $password;
+		$this->initCallback = $initCallback;
 		$this->options = $options + $this->options;
 	}
 
 	public function getPDO(): PDO
 	{
 		if ($this->pdo === null) {
+
 			$this->pdo = new PDO(
 				$this->dsn,
 				$this->username,
 				$this->password,
 				$this->options
 			);
+
+			if ($this->initCallback) {
+				($this->initCallback)($this->pdo);
+			}
 		}
 
 		return $this->pdo;

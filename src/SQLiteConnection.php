@@ -24,22 +24,34 @@ final class SQLiteConnection implements ConnectionInterface
 	protected $enableExceptions;
 
 	/** @var null|SQLite3 */
-	protected $db;
+	protected $sqlite;
 
-	public function __construct(string $filename, bool $enableExceptions = true)
-	{
+	/** @var null|callable */
+	protected $initCallback;
+
+	public function __construct(
+		string $filename,
+		bool $enableExceptions = true,
+		?callable $initCallback = null
+	) {
 		$this->filename = $filename;
 		$this->enableExceptions = $enableExceptions;
+		$this->initCallback = $initCallback;
 	}
 
 	public function getSQLite(): SQLite3
 	{
-		if ($this->db === null) {
-			$this->db = new SQLite3($this->filename);
-			$this->db->enableExceptions($this->enableExceptions);
+		if ($this->sqlite === null) {
+
+			$this->sqlite = new SQLite3($this->filename);
+			$this->sqlite->enableExceptions($this->enableExceptions);
+
+			if ($this->initCallback) {
+				($this->initCallback)($this->sqlite);
+			}
 		}
 
-		return $this->db;
+		return $this->sqlite;
 	}
 
 	protected function prepare(string $sql, ?array $params): ?SQLite3Stmt

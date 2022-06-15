@@ -130,4 +130,19 @@ final class ConnectionTest extends TestCase
 		$rows = $conn->fetchColumn('select number, text from test', null, 1);
 		$this->assertSame(['hello', 'world'], iterator_to_array($rows));
 	}
+
+	public function testInitCallback(): void
+	{
+		$count = 0;
+		$conn = new Connection('sqlite::memory:', null, null, [], function (PDO $pdo) use (&$count) {
+			$this->assertInstanceOf(PDO::class, $pdo);
+			$count++;
+		});
+
+		$conn->getPDO();
+		$conn->getPDO();
+		$conn->getPDO();
+
+		$this->assertEquals(1, $count);
+	}
 }
