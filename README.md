@@ -33,6 +33,7 @@ interface ConnectionInterface
 {
 	public function execute(string $sql, ?array $params = null): bool;
 	public function fetchRow(string $sql, ?array $params = null): ?array;
+	public function fetchColumn(string $sql, ?array $params = null, int $column = 0): Generator;
 	public function fetchAll(string $sql, ?array $params = null): Generator;
 	public function fetchResult(string $sql, ?array $params = null): ResultSetInterface;
 	public function fetchValue(string $sql, ?array $params = null);
