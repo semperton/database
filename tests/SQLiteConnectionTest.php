@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use Semperton\Database\SQLiteConnection;
-use Semperton\Database\SQLiteResultSet;
+use Semperton\Database\Connection\SQLiteConnection;
+use Semperton\Database\ResultSet\SQLiteResultSet;
 
 final class SQLiteConnectionTest extends TestCase
 {

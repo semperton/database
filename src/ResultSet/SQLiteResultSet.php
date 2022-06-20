@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Database;
+namespace Semperton\Database\ResultSet;
 
-use PDO;
-use PDOStatement;
+use Semperton\Database\ResultSetInterface;
+use SQLite3Result;
 
 use function iterator_to_array;
 
-final class ResultSet implements ResultSetInterface
-{
-	/** @var PDOStatement */
-	protected $statement;
+use const SQLITE3_ASSOC;
+use const SQLITE3_NUM;
 
-	/** @var bool */
-	protected $executed;
+final class SQLiteResultSet implements ResultSetInterface
+{
+	/** @var SQLite3Result */
+	protected $result;
 
 	/** @var null|array<string, mixed> */
 	protected $current;
@@ -23,12 +23,10 @@ final class ResultSet implements ResultSetInterface
 	/** @var int */
 	protected $position = -1;
 
-	public function __construct(PDOStatement $statement)
+	public function __construct(SQLite3Result $result)
 	{
-		$this->statement = $statement;
-
-		/** @psalm-suppress RedundantCondition */
-		$this->executed = $this->statement->errorCode() !== null;
+		$this->result = $result;
+		$this->next(); // fetch first value
 	}
 
 	/**
@@ -43,10 +41,10 @@ final class ResultSet implements ResultSetInterface
 
 	public function count(): int
 	{
-		$this->execute();
+		$this->result->reset();
 
 		$count = 0;
-		while (false !== $this->statement->fetch(PDO::FETCH_LAZY)) {
+		while (false !== $this->result->fetchArray(SQLITE3_NUM)) {
 			$count++;
 		}
 
@@ -65,16 +63,12 @@ final class ResultSet implements ResultSetInterface
 	public function rewind(): void
 	{
 		$this->position = -1;
-		$this->execute();
+		$this->result->reset();
 		$this->next();
 	}
 
 	public function key(): ?int
 	{
-		if (!$this->executed) {
-			$this->rewind();
-		}
-
 		return $this->position >= 0 ? $this->position : null;
 	}
 
@@ -83,21 +77,13 @@ final class ResultSet implements ResultSetInterface
 	 */
 	public function current(): ?array
 	{
-		if (!$this->executed) {
-			$this->rewind();
-		}
-
 		return $this->current;
 	}
 
 	public function next(): void
 	{
-		if (!$this->executed) {
-			$this->rewind();
-		}
-
 		/** @var false|array<string, mixed> */
-		$record = $this->statement->fetch(PDO::FETCH_ASSOC);
+		$record = $this->result->fetchArray(SQLITE3_ASSOC);
 
 		if ($record !== false) {
 			$this->current = $record;
@@ -110,17 +96,6 @@ final class ResultSet implements ResultSetInterface
 
 	public function valid(): bool
 	{
-		if (!$this->executed) {
-			$this->rewind();
-		}
-
 		return $this->current !== null;
-	}
-
-	protected function execute(): void
-	{
-		$this->statement->closeCursor();
-		$this->statement->execute();
-		$this->executed = true;
 	}
 }

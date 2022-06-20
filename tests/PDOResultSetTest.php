@@ -3,27 +3,27 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use Semperton\Database\Connection;
-use Semperton\Database\EmptyResultSet;
-use Semperton\Database\ResultSet;
+use Semperton\Database\Connection\PDOConnection;
+use Semperton\Database\ResultSet\EmptyResultSet;
+use Semperton\Database\ResultSet\PDOResultSet;
 
-final class ResultSetTest extends TestCase
+final class PDOResultSetTest extends TestCase
 {
 	public function testInstance(): void
 	{
-		$conn = new Connection('sqlite::memory:', null, null, [
+		$conn = new PDOConnection('sqlite::memory:', null, null, [
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
 		]);
 		$result = $conn->fetchResult('select');
 		$this->assertInstanceOf(EmptyResultSet::class, $result);
 
 		$result = $conn->fetchResult('select 1');
-		$this->assertInstanceOf(ResultSet::class, $result);
+		$this->assertInstanceOf(PDOResultSet::class, $result);
 	}
 
 	public function testFirst(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$result = $conn->fetchResult('values (42), (2), (1)');
 		$first = $result->first() ?? [];
 
@@ -32,7 +32,7 @@ final class ResultSetTest extends TestCase
 
 	public function testCount(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$result = $conn->fetchResult('values (42), (2), (1), (3)');
 		$count = $result->count();
 
@@ -48,7 +48,7 @@ final class ResultSetTest extends TestCase
 
 	public function testToArray(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$result = $conn->fetchResult('values (42), (2), (1)');
 		$arr = $result->toArray();
 		$this->assertIsArray($arr);
@@ -58,7 +58,7 @@ final class ResultSetTest extends TestCase
 
 	public function testIterator(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$result = $conn->fetchResult('values (1), (2), (3), (4), (5)');
 
 		$this->assertEquals(0, $result->key());
@@ -87,7 +87,7 @@ final class ResultSetTest extends TestCase
 
 	public function testResultMutation(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer not null primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);

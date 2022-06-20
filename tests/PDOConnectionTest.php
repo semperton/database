@@ -3,21 +3,21 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use Semperton\Database\Connection;
+use Semperton\Database\Connection\PDOConnection;
 use Semperton\Database\ResultSetInterface;
 
-final class ConnectionTest extends TestCase
+final class PDOConnectionTest extends TestCase
 {
 	public function testException(): void
 	{
 		$this->expectException(PDOException::class);
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('select');
 	}
 
 	public function testExecute(): void
 	{
-		$conn = new Connection('sqlite::memory:', null, null, [
+		$conn = new PDOConnection('sqlite::memory:', null, null, [
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
 		]);
 		$result = $conn->execute('create table test (id integer primary key)');
@@ -29,7 +29,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchValue(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -41,7 +41,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchRow(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -53,7 +53,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchAll(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -73,7 +73,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchResult(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -93,7 +93,7 @@ final class ConnectionTest extends TestCase
 
 	public function testLastInsertId(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -104,7 +104,7 @@ final class ConnectionTest extends TestCase
 
 	public function testAffectedRows(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -118,7 +118,7 @@ final class ConnectionTest extends TestCase
 
 	public function testFetchColumn(): void
 	{
-		$conn = new Connection('sqlite::memory:');
+		$conn = new PDOConnection('sqlite::memory:');
 		$conn->execute('create table test (id integer primary key, number integer not null, text varchar not null)');
 
 		$conn->execute('insert into test (number, text) values (?, ?)', [42, 'hello']);
@@ -134,7 +134,7 @@ final class ConnectionTest extends TestCase
 	public function testInitCallback(): void
 	{
 		$count = 0;
-		$conn = new Connection('sqlite::memory:', null, null, [], function (PDO $pdo) use (&$count) {
+		$conn = new PDOConnection('sqlite::memory:', null, null, [], function (PDO $pdo) use (&$count) {
 			$this->assertInstanceOf(PDO::class, $pdo);
 			$count++;
 		});

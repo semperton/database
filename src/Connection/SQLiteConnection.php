@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Database;
+namespace Semperton\Database\Connection;
 
 use Exception;
 use Generator;
+use Semperton\Database\ConnectionInterface;
+use Semperton\Database\ResultSet\EmptyResultSet;
+use Semperton\Database\ResultSet\SQLiteResultSet;
+use Semperton\Database\ResultSetInterface;
 use SQLite3;
 use SQLite3Result;
 use SQLite3Stmt;

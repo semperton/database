@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Database;
+namespace Semperton\Database\Connection;
 
 use ArrayAccess;
 use Generator;
 use PDO;
 use PDOStatement;
+use Semperton\Database\ConnectionInterface;
+use Semperton\Database\ResultSet\EmptyResultSet;
+use Semperton\Database\ResultSet\PDOResultSet;
+use Semperton\Database\ResultSetInterface;
 
 use function key;
 use function array_unshift;
@@ -15,7 +19,7 @@ use function is_int;
 use function is_bool;
 use function is_null;
 
-final class Connection implements ConnectionInterface
+final class PDOConnection implements ConnectionInterface
 {
 	/** @var array */
 	protected $options = [
@@ -167,7 +171,7 @@ final class Connection implements ConnectionInterface
 	{
 		if ($stm = $this->prepare($sql, $params)) {
 
-			return new ResultSet($stm);
+			return new PDOResultSet($stm);
 		}
 
 		return new EmptyResultSet();

@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Semperton\Database;
+namespace Semperton\Database\ResultSet;
 
 use EmptyIterator;
+use Semperton\Database\ResultSetInterface;
 
 final class EmptyResultSet extends EmptyIterator implements ResultSetInterface
 {
