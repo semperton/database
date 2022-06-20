@@ -19,16 +19,24 @@ Database requires PHP 7.2+
 
 ## Connection
 
-The ```Connection``` class is a ```PDO``` wrapper.
+The ```PDOConnection``` class is a ```PDO``` wrapper.
 Its constructor accepts the same parameters as the ```PDO``` constructor.
 
 ```PHP
-use Semperton\Database\Connection;
+use Semperton\Database\Connection\PDOConnection;
 
-$connection = new Connection('dsn', null, null, [
+$connection = new PDOConnection('dsn', null, null, [
 	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 ]);
+```
 
+The internal PDO object is lazily created, when you make the first database call.
+You can pass a ```callable``` as the 5th argument to the ```PDOConnection``` constructor
+that gets called, when PDO first initializes.
+
+## Interface
+
+```PHP
 interface ConnectionInterface
 {
 	public function execute(string $sql, ?array $params = null): bool;
