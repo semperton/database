@@ -14,14 +14,12 @@ use const SQLITE3_NUM;
 
 final class SQLiteResultSet implements ResultSetInterface
 {
-	/** @var SQLite3Result */
-	protected $result;
+	protected SQLite3Result $result;
 
 	/** @var null|array<string, mixed> */
-	protected $current;
+	protected ?array $current;
 
-	/** @var int */
-	protected $position = -1;
+	protected int $position = -1;
 
 	public function __construct(SQLite3Result $result)
 	{

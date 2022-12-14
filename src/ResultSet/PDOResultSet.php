@@ -12,17 +12,14 @@ use function iterator_to_array;
 
 final class PDOResultSet implements ResultSetInterface
 {
-	/** @var PDOStatement */
-	protected $statement;
+	protected PDOStatement $statement;
 
-	/** @var bool */
-	protected $executed;
+	protected bool $executed;
 
 	/** @var null|array<string, mixed> */
-	protected $current;
+	protected ?array $current = null;
 
-	/** @var int */
-	protected $position = -1;
+	protected int $position = -1;
 
 	public function __construct(PDOStatement $statement)
 	{

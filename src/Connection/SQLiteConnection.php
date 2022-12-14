@@ -21,14 +21,11 @@ use const SQLITE3_ASSOC;
 
 final class SQLiteConnection implements ConnectionInterface
 {
-	/** @var string */
-	protected $filename;
+	protected string $filename;
 
-	/** @var bool */
-	protected $enableExceptions;
+	protected bool $enableExceptions;
 
-	/** @var null|SQLite3 */
-	protected $sqlite;
+	protected ?SQLite3 $sqlite = null;
 
 	/** @var null|callable */
 	protected $initCallback;

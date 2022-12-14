@@ -15,7 +15,7 @@ Just use Composer:
 ```
 composer require semperton/database
 ```
-Database requires PHP 7.2+
+Database requires PHP 7.4+
 
 ## Connection
 

@@ -21,27 +21,21 @@ use function is_null;
 
 final class PDOConnection implements ConnectionInterface
 {
-	/** @var array */
-	protected $options = [
+	protected array $options = [
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_EMULATE_PREPARES => false,
 		PDO::ATTR_STRINGIFY_FETCHES => false
 	];
 
-	/** @var string */
-	private $dsn;
+	private string $dsn;
 
-	/** @var null|string */
-	private $username;
+	private ?string $username;
 
-	/** @var null|string */
-	private $password;
+	private ?string $password;
 
-	/** @var null|PDO */
-	protected $pdo;
+	protected ?PDO $pdo = null;
 
-	/** @var int */
-	protected $changes = 0;
+	protected int $changes = 0;
 
 	/** @var null|callable */
 	protected $initCallback;
